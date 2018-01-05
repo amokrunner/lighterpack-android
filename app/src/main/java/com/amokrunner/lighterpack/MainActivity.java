@@ -1,52 +1,87 @@
 package com.amokrunner.lighterpack;
 
-import android.support.v7.app.AppCompatActivity;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.webkit.CookieManager;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
+import im.delight.android.webview.AdvancedWebView;
 
-public class MainActivity extends AppCompatActivity {
-    WebView webView;
+public class MainActivity extends Activity implements AdvancedWebView.Listener {
+
+    private AdvancedWebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        webView = (WebView) findViewById(R.id.activity_main_webview);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-        CookieManager.getInstance().setAcceptCookie(true);
+        mWebView = (AdvancedWebView) findViewById(R.id.webview);
+        mWebView.setListener(this, this);
 
-        webView.setWebViewClient(new WebViewClient() {
+        mWebView.getSettings().setLoadWithOverviewMode(true);
+        mWebView.getSettings().setUseWideViewPort(true);
+        mWebView.getSettings().setBuiltInZoomControls(true);
 
-            private boolean alreadyEvaluated = false;
+        mWebView.loadUrl("https://lighterpack.com/");
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                webView.evaluateJavascript("javascript:$.getScript('https://rawgit.com/amokrunner/lighterpack-userscripts/master/all.js');",null);
-                super.onPageFinished(view, url);
-            }
-        });
-        webView.setWebChromeClient(new WebChromeClient());
-        webView.loadUrl("https://lighterpack.com/");
+        // ...
+    }
 
+    @SuppressLint("NewApi")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mWebView.onResume();
+        // ...
+    }
+
+    @SuppressLint("NewApi")
+    @Override
+    protected void onPause() {
+        mWebView.onPause();
+        // ...
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mWebView.onDestroy();
+        // ...
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        mWebView.onActivityResult(requestCode, resultCode, intent);
+        // ...
     }
 
     @Override
     public void onBackPressed() {
-        if(webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
+        if (!mWebView.onBackPressed()) { return; }
+        // ...
+        super.onBackPressed();
     }
+
+    @Override
+    public void onPageStarted(String url, Bitmap favicon) { }
+
+    @Override
+    public void onPageFinished(String url) {
+        mWebView.evaluateJavascript("javascript:$.getScript('https://rawgit.com/amokrunner/lighterpack-userscripts/master/all.js');",null);
+    }
+
+    @Override
+    public void onPageError(int errorCode, String description, String failingUrl) { }
+
+    @Override
+    public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) { }
+
+    @Override
+    public void onExternalPageRequest(String url) { }
+
 }
