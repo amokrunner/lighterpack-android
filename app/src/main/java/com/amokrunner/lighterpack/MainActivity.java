@@ -24,6 +24,7 @@ public class MainActivity extends Activity implements AdvancedWebView.Listener {
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
+        mWebView.getSettings().setDisplayZoomControls(false);
 
         mWebView.loadUrl("https://lighterpack.com/");
 
